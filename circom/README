@@ -1,0 +1,51 @@
+## My circom
+
+Follow this: https://docs.circom.io/getting-started/installation/.
+
+Try to compile and generate proof, you can follow command line written in `Makefile`.
+
+#### Step 1: Compile circom
+
+```shell
+make compile name=circom-file-name
+```
+
+#### Step 2: Provide power
+
+```shell
+make power power=power name=circom-file-name
+```
+
+You can select enough power by this [link](https://github.com/iden3/snarkjs)
+
+#### Step 3: Generate smart contract
+
+```shell
+make solidity name=circom-file-name
+```
+
+#### Step 4: Compute witness
+
+```shell
+make witness name=circom-file-name
+```
+
+You first need to generate input.json file.
+
+#### Step 5: Generate proof
+
+```shell
+make proof name=circom-file-name
+```
+
+#### Step 6: Try to verify your proof
+
+```shell
+make verify
+```
+
+### Run circom test
+
+```shell
+make circom_test name=circom-test-name
+```
