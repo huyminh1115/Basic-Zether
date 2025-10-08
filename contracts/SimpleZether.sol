@@ -124,6 +124,9 @@ contract SimpleZether {
         // check sender is registered
         require(registered(senderPubKeyHash), "Sender is not registered");
 
+        // check sender is authorized
+        require(checkLock(senderPubKeyHash, msg.sender), "Not authorized");
+
         // roll over sender
         _rollOver(senderPubKeyHash);
 
@@ -138,8 +141,6 @@ contract SimpleZether {
         } else {
             _rollOver(receiverPubKeyHash);
         }
-
-        require(checkLock(senderPubKeyHash, msg.sender), "Not authorized");
 
         uint256[16] memory _pubSignals = [
             senderPubKey.x,
@@ -226,5 +227,7 @@ contract SimpleZether {
         payable(msg.sender).transfer(transferAmount);
 
         counter[pubKeyHash]++;
+
+        totalSupply -= bTransfer;
     }
 }

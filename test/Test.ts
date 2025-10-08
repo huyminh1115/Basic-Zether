@@ -1,7 +1,7 @@
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
 import { expect } from "chai";
 import hre from "hardhat";
-import { PublicClient, TestClient } from "viem";
+import { PublicClient, TestClient, parseEther } from "viem";
 import Client from "../client/Client";
 import { initializeBabyJub, generateBabyJubAccount } from "../client/ultis";
 
@@ -248,6 +248,52 @@ describe("Test SimpleZether", function () {
       );
       // Receiver receives both transfers after rollover
       expect(receiverBalAfter).to.equal(2 * 10 ** DECIMALS);
+    });
+
+    it("5) Burn transfers correct ETH amount and updates total supply", async function () {
+      const {
+        SimpleZether,
+        accounts,
+        zetherAccount1,
+        publicClient,
+        testClient,
+      } = await loadFixture(setupAll);
+
+      const client1 = new Client(MAX, zetherAccount1);
+
+      // Fund contract with 2 ETH for this account and roll over
+      await client1.fund(SimpleZether, accounts[1].account, "2");
+      await increaseToNextEpoch(publicClient, testClient);
+
+      // Contract balance before burn should be 2 ETH
+      const beforeContractBal = await publicClient.getBalance({
+        address: SimpleZether.address as `0x${string}`,
+      });
+
+      // Total supply before burn
+      const totalSupplyBefore = await SimpleZether.read.totalSupply();
+
+      // Burn exactly 1 * 10^DECIMALS units -> expects 1 ETH returned
+      const burnUnits = String(10 ** DECIMALS);
+      await client1.burn(
+        SimpleZether,
+        publicClient,
+        accounts[1].account,
+        burnUnits
+      );
+
+      // Contract balance should reduce by exactly 1 ETH (gas paid by caller, not from contract)
+      const afterContractBal = await publicClient.getBalance({
+        address: SimpleZether.address as `0x${string}`,
+      });
+      const expectedDelta = parseEther("1");
+      expect(beforeContractBal - afterContractBal).to.equal(expectedDelta);
+
+      // Total supply should decrease by burned units
+      const totalSupplyAfter = await SimpleZether.read.totalSupply();
+      expect(totalSupplyBefore - totalSupplyAfter).to.equal(
+        BigInt(10 ** DECIMALS)
+      );
     });
   });
 });
