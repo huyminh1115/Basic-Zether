@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./BabyJub.sol";
 import "./Verifier/Verifier.sol";
 
-contract SimpleZether {
+contract BasicZether {
     using BabyJub for BabyJub.Point;
 
     uint8 immutable public DECIMALS;
@@ -51,7 +51,6 @@ contract SimpleZether {
 
     function lock(BabyJub.Point memory y, address lockAddress, uint256 c, uint256 s) public {
         bytes32 yHash = keccak256(abi.encode(y));
-        require(registered(yHash), "Account not registered!");
 
         // allows y to participate. c, s should be a Schnorr signature on "this"
         BabyJub.Point memory K = BabyJub.base().mul(s).add(BabyJub.neg(BabyJub.mul(y, c)));

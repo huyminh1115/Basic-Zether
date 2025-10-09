@@ -23,7 +23,7 @@ import {
 } from "./ultis";
 
 // Use the generated contract type from artifacts
-type MyZSCContract = GetContractReturnType<BasicZether$Type["abi"]>;
+type BasicZetherContract = GetContractReturnType<BasicZether$Type["abi"]>;
 
 type PublicClient = {
   getBlockNumber: () => Promise<bigint>;
@@ -70,7 +70,11 @@ class Client {
     return this.account.publicKey;
   }
 
-  async fund(BasicZether: MyZSCContract, account: Account, amount: string) {
+  async fund(
+    BasicZether: BasicZetherContract,
+    account: Account,
+    amount: string
+  ) {
     const valueWei = parseEther(String(amount));
     return BasicZether.write.fund([this.publicKey], {
       value: valueWei,
@@ -79,7 +83,7 @@ class Client {
   }
 
   async burn(
-    BasicZether: MyZSCContract,
+    BasicZether: BasicZetherContract,
     publicClient: PublicClient,
     account: Account,
     amount: string
@@ -117,7 +121,7 @@ class Client {
   }
 
   async transfer(
-    BasicZether: MyZSCContract,
+    BasicZether: BasicZetherContract,
     publicClient: PublicClient,
     account: Account,
     amount: string,
@@ -181,7 +185,7 @@ class Client {
   }
 
   async stimulateAccount(
-    BasicZether: MyZSCContract,
+    BasicZether: BasicZetherContract,
     publicClient: PublicClient
   ) {
     const [epochLength, blockNumber] = await Promise.all([
@@ -198,13 +202,13 @@ class Client {
     return accountData;
   }
 
-  async rollOver(BasicZether: MyZSCContract) {
+  async rollOver(BasicZether: BasicZetherContract) {
     return BasicZether.write.rollOver([this.publicKey]);
   }
 
   // current balance for current epoch
   async getCurrentBalance(
-    BasicZether: MyZSCContract,
+    BasicZether: BasicZetherContract,
     publicClient: PublicClient
   ): Promise<number | undefined> {
     const accountData = await this.stimulateAccount(BasicZether, publicClient);
@@ -212,7 +216,7 @@ class Client {
   }
 
   async lock(
-    BasicZether: MyZSCContract,
+    BasicZether: BasicZetherContract,
     account: Account,
     lockAddress: string
   ) {
@@ -236,7 +240,7 @@ class Client {
     );
   }
 
-  async unlock(BasicZether: MyZSCContract, account: Account) {
+  async unlock(BasicZether: BasicZetherContract, account: Account) {
     return BasicZether.write.unlock([this.publicKey], {
       account,
     });
